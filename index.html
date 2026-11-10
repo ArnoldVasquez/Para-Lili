@@ -7,11 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
         :root {
-            --mc-dark: #0d0714;
+            --mc-dark: #120c1f;
             --mc-purple: #8b5cf6;
-            --mc-purple-dark: #3b1d75;
             --mc-accent: #d8b4fe;
-            --mc-green: #34d399;
         }
 
         * {
@@ -30,13 +28,16 @@
             justify-content: center;
             align-items: center;
             overflow-x: hidden;
-            /* Fondo con textura estilo bloques y viñeta morada nocturna */
+            /* Patrón de bloques pixelados estilo Minecraft oscuro en el fondo */
             background-image: 
-                radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.25) 0%, transparent 70%),
-                linear-gradient(rgba(13, 7, 20, 0.85), rgba(13, 7, 20, 0.95)),
-                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255, 255, 255, 0.015) 39px, rgba(255, 255, 255, 0.015) 40px),
-                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255, 255, 255, 0.015) 39px, rgba(255, 255, 255, 0.015) 40px);
-            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+                radial-gradient(circle at 50% 25%, rgba(139, 92, 246, 0.35) 0%, transparent 60%),
+                linear-gradient(135deg, rgba(8, 4, 15, 0.92), rgba(26, 14, 43, 0.92)),
+                linear-gradient(45deg, #1b102b 25%, transparent 25%), 
+                linear-gradient(-45deg, #1b102b 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #1b102b 75%), 
+                linear-gradient(-45deg, transparent 75%, #1b102b 75%);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px, 32px 32px, 32px 32px;
+            background-position: 0 0, 0 0, 0 0, 0 16px, 16px -16px, -16px 0px;
         }
 
         /* Pantalla de Carga Estilo Minecraft */
@@ -171,10 +172,10 @@
             color: #cbd5e1;
             margin-top: 8px;
             text-align: center;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.75);
             padding: 6px 12px;
             border-radius: 4px;
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.4);
         }
 
         /* Mobile Touch Controls */
