@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Cumpleaños Lili ❤️ Minecraft Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mc-dark: #120e16;
+            --mc-purple: #8b5cf6;
+            --mc-purple-dark: #4c1d95;
+            --mc-accent: #d8b4fe;
+            --mc-green: #34d399;
+            --mc-dirt: #3d2817;
+            --mc-grass: #4a7c2c;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--mc-dark);
+            color: #ffffff;
+            font-family: 'VT323', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 20%, #2e1065 0%, transparent 60%),
+                linear-gradient(to bottom, #090514, #180b2b);
+        }
+
+        /* Pantalla de Carga Estilo Minecraft */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #11091c;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .mojang-logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+            color: #ef4444;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+            text-shadow: 3px 3px 0px #000;
+            text-align: center;
+        }
+
+        .progress-bar-container {
+            width: 280px;
+            height: 20px;
+            background: #000;
+            border: 3px solid #555;
+            padding: 2px;
+            box-shadow: inset 0 0 10px #000;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #f97316);
+            transition: width 0.3s ease;
+        }
+
+        .loading-text {
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            color: #aaa;
+            margin-top: 15px;
+        }
+
+        .start-btn-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        /* Contenedor Principal */
+        .game-wrapper {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* UI de Minecraft */
+        .mc-button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: #fff;
+            background: #706f71;
+            border: 4px solid;
+            border-color: #a8a8a8 #373737 #373737 #a8a8a8;
+            padding: 14px 24px;
+            cursor: pointer;
+            text-shadow: 2px 2px 0px #000;
+            box-shadow: 0 5px 0 #000;
+            transition: all 0.1s;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .mc-button:hover {
+            background: #8b8a8c;
+            border-color: #c6c6c6 #2a2a2a #2a2a2a #c6c6c6;
+        }
+
+        .mc-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #000;
+        }
+
+        /* Encabezado */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 22px;
+            color: #facc15;
+            text-shadow: 3px 3px 0 #000, -2px -2px 0 #000;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: var(--mc-accent);
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        /* Canvas del Juego */
+        .canvas-container {
+            position: relative;
+            border: 4px solid #000;
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
+            margin-bottom: 20px;
+            background: #000;
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        .controls-hint {
+            font-size: 18px;
+            color: #cbd5e1;
+            margin-top: 8px;
+            text-align: center;
+            background: rgba(0,0,0,0.6);
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        /* Mobile Touch Controls */
+        .touch-controls {
+            display: none;
+            grid-template-columns: repeat(3, 50px);
+            grid-template-rows: repeat(2, 50px);
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .touch-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid #fff;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        /* Modal / Libro de Minecraft */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .book-container {
+            width: 90%;
+            max-width: 650px;
+            background: #e2d6b5;
+            border: 6px solid #4a3525;
+            border-radius: 4px;
+            color: #1a120b;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .book-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            color: #8b4513;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #8b4513;
+            padding-bottom: 10px;
+        }
+
+        .book-content {
+            font-size: 22px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .book-footer {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        /* Inventario de Cupones */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .inventory-slot {
+            background: #8b8b8b;
+            border: 3px solid;
+            border-color: #373737 #ffffff #ffffff #373737;
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-align: center;
+        }
+
+        .inventory-slot:hover {
+            transform: scale(1.05);
+            background: #a0a0a0;
+        }
+
+        .slot-icon {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+
+        .slot-title {
+            font-size: 16px;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000;
+            line-height: 1.1;
+        }
+
+        /* Audio Toggle */
+        .music-toggle {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 600;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 16px; }
+            .subtitle { font-size: 18px; }
+            .touch-controls { display: grid; }
+            .controls-hint { display: none; }
+            .book-content { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio original de Minecraft -->
+    <audio id="mc-audio" loop preload="auto">
+        <source src="musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Toggle de Música -->
+    <div class="music-toggle">
+        <button id="audio-btn" class="mc-button" style="padding: 8px 12px; font-size: 10px;">🎵 Música: OFF</button>
+    </div>
+
+    <!-- Pantalla de Carga -->
+    <div id="loading-screen">
+        <div class="mojang-logo">LILI STUDIOS</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="p-bar"></div>
+        </div>
+        <div class="loading-text" id="p-text">Generando mundo de Lili...</div>
+        <div class="start-btn-container" id="start-box">
+            <button class="mc-button" id="start-btn">ENTRAR AL MUNDO</button>
+        </div>
+    </div>
+
+    <!-- Juego Principal -->
+    <div class="game-wrapper">
+        <header>
+            <h1>FELIZ CUMPLEAÑOS LILI 💜</h1>
+            <div class="subtitle">Una pequeña aventura para la persona más especial</div>
+        </header>
+
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="640" height="400"></canvas>
+        </div>
+
+        <div class="controls-hint">
+            Usa las flechas o WASD para moverte. ¡Recolecta los ítems especiales! 🌸✈️🍣🐶
+        </div>
+
+        <div class="touch-controls">
+            <div></div>
+            <div class="touch-btn" id="btn-up">⬆️</div>
+            <div></div>
+            <div class="touch-btn" id="btn-left">⬅️</div>
+            <div class="touch-btn" id="btn-down">⬇️</div>
+            <div class="touch-btn" id="btn-right">➡️</div>
+        </div>
+
+        <!-- Inventario de Regalos/Cupones -->
+        <div style="width: 100%; margin-top: 25px;">
+            <div style="font-family: 'Press Start 2P'; font-size: 12px; color: var(--mc-accent); text-align: center; margin-bottom: 10px;">
+                INVENTARIO DE CUPONES (HAZ CLIC):
+            </div>
+            <div class="inventory-grid">
+                <div class="inventory-slot" onclick="openCoupon('🍣 Vale por una Cena de Sushi', 'Válido por tu sushi preferido cuando quieras, listo para disfrutar juntos.')">
+                    <div class="slot-icon">🍣</div>
+                    <div class="slot-title">Cena de Sushi</div>
+                </div>
+                <div class="inventory-slot" onclick="openCoupon('📺 Maratón de PC & Comida', 'Un fin de semana perfecto: pedir algo rico para comer y quedarnos acostados viendo algo en la PC.')">
+                    <div class="slot-icon">🍿</div>
+                    <div class="slot-title">Maratón & PC</div>
+                </div>
+                <div class="inventory-slot" onclick="openCoupon('🐶 Paseo con Vaquita', 'Vale por una tarde libre de caminata y juegos con nuestra cachorrita Vaquita.')">
+                    <div class="slot-icon">🐾</div>
+                    <div class="slot-title">Paseo Vaquita</div>
+                </div>
+                <div class="inventory-slot" onclick="openCoupon('💐 Ramo de Lirios', 'Un detalle especial con tus flores favoritas para alegrar tu día.')">
+                    <div class="slot-icon">🌸</div>
+                    <div class="slot-title">Ramo Lirios</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal del Libro / Carta -->
+    <div class="modal-overlay" id="book-modal">
+        <div class="book-container">
+            <div class="book-title">📖 LIBRO DE NUESTRA HISTORIA</div>
+            <div class="book-content" id="book-text"></div>
+            <div class="book-footer">
+                <button class="mc-button" onclick="closeBook()">CERRAR LIBRO</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- REPRODUCTOR DE MÚSICA ORIGINAL --- */
+        const audio = document.getElementById('mc-audio');
+        let audioActive = false;
+
+        document.getElementById('audio-btn').addEventListener('click', () => {
+            if (!audioActive) {
+                audio.play().then(() => {
+                    audioActive = true;
+                    document.getElementById('audio-btn').innerText = "🎵 Música: ON";
+                }).catch(e => console.log("Bloqueado por navegador", e));
+            } else {
+                audio.pause();
+                audioActive = false;
+                document.getElementById('audio-btn').innerText = "🎵 Música: OFF";
+            }
+        });
+
+        /* --- PANTALLA DE CARGA --- */
+        let progress = 0;
+        const pBar = document.getElementById('p-bar');
+        const pText = document.getElementById('p-text');
+        const startBox = document.getElementById('start-box');
+
+        const loadInterval = setInterval(() => {
+            progress += Math.floor(Math.random() * 15) + 5;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadInterval);
+                pText.innerText = "¡Mundo listo!";
+                startBox.style.display = "block";
+            }
+            pBar.style.width = progress + "%";
+        }, 150);
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            document.getElementById('loading-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.visibility = 'hidden';
+            }, 800);
+
+            // Iniciar música automáticamente al entrar al mundo
+            if (!audioActive) {
+                audio.play().then(() => {
+                    audioActive = true;
+                    document.getElementById('audio-btn').innerText = "🎵 Música: ON";
+                }).catch(e => console.log("Reproducción automática bloqueada", e));
+            }
+        });
+
+        /* --- CARTA PERSONALIZADA --- */
+        const storyLetter = `Feliz cumpleaños, papita. ❤️
+
+Desde la primera vez que te vi supe que había algo muy lindo en ti, y empezar a conocerte poco a poco ha sido de las mejores cosas que me han pasado xd. 
+
+Todavía me acuerdo de nuestro primer paseo juntos, de cómo me tomaste del brazo para caminar y de lo apenado que me sentí en ese momento. Fue un día increíble poder platicar, acompañarte y compartir juntos. Igual que la cita en el zoológico, ver cómo quieres a los animales y que el plan original era ir al cine pero terminamos quedándonos dormidos xd.
+
+Disfruto demasiado el tiempo que comparto contigo. Los fines de semana cuando pedimos algo de comer, sea sushi, pasticho o unas hamburguesitas, y nos quedamos viendo cualquier cosa en la PC... me hace súper feliz, simplemente porque es contigo.
+
+Estar a tu lado, acostados, sentir tus abrazos y tus caricias me da una calma increíble. Me haces sentir querido, amado y muy cuidado. Esta es mi primera relación y no imagino una persona mejor con quien compartir todo esto, además de la emoción de que pronto tendremos a Vaquita con nosotros 🐶.
+
+Gracias por ser como eres, tan responsable, dedicada con tu carrera de ingeniería y aviación en el ETA, y sobre todo tan linda conmigo.
+
+Te quiero muchísimo, papita. Espero que disfrutes mucho tu día. ✨🌸`;
+
+        function openBook() {
+            document.getElementById('book-text').innerText = storyLetter;
+            document.getElementById('book-modal').classList.add('active');
+        }
+
+        function closeBook() {
+            document.getElementById('book-modal').classList.remove('active');
+        }
+
+        function openCoupon(title, text) {
+            document.getElementById('book-text').innerText = `${title}\n\n${text}`;
+            document.getElementById('book-modal').classList.add('active');
+        }
+
+        /* --- MOTOR DEL JUEGO CANVAS --- */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const player = {
+            x: 50,
+            y: 180,
+            width: 24,
+            height: 32,
+            speed: 3.5
+        };
+
+        const vaquita = {
+            x: 20,
+            y: 180,
+            width: 16,
+            height: 16,
+            active: false
+        };
+
+        let items = [
+            { x: 180, y: 100, type: 'lily', icon: '🌸', collected: false },
+            { x: 320, y: 250, type: 'sushi', icon: '🍣', collected: false },
+            { x: 450, y: 120, type: 'plane', icon: '✈️', collected: false },
+            { x: 550, y: 280, type: 'vaquita', icon: '🐶', collected: false }
+        ];
+
+        const mobs = [
+            { x: 100, y: 300, type: 'cat', icon: '🐱', dx: 0.5 },
+            { x: 400, y: 70, type: 'pig', icon: '🐷', dx: -0.4 }
+        ];
+
+        const chest = {
+            x: 570,
+            y: 180,
+            width: 30,
+            height: 30,
+            open: false
+        };
+
+        const keys = {};
+
+        window.addEventListener('keydown', e => keys[e.key] = true);
+        window.addEventListener('keyup', e => keys[e.key] = false);
+
+        const bindTouch = (id, key) => {
+            const btn = document.getElementById(id);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[key] = true; });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[key] = false; });
+        };
+        bindTouch('btn-up', 'ArrowUp');
+        bindTouch('btn-down', 'ArrowDown');
+        bindTouch('btn-left', 'ArrowLeft');
+        bindTouch('btn-right', 'ArrowRight');
+
+        function update() {
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) player.y = Math.max(40, player.y - player.speed);
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) player.y = Math.min(canvas.height - 50, player.y + player.speed);
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.x = Math.max(20, player.x - player.speed);
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) player.x = Math.min(canvas.width - 40, player.x + player.speed);
+
+            if (vaquita.active) {
+                const dx = (player.x - 25) - vaquita.x;
+                const dy = player.y - vaquita.y;
+                vaquita.x += dx * 0.08;
+                vaquita.y += dy * 0.08;
+            }
+
+            mobs.forEach(m => {
+                m.x += m.dx;
+                if (m.x > 600 || m.x < 50) m.dx *= -1;
+            });
+
+            items.forEach(item => {
+                if (!item.collected) {
+                    const dist = Math.hypot(player.x - item.x, player.y - item.y);
+                    if (dist < 25) {
+                        item.collected = true;
+                        if (item.type === 'vaquita') vaquita.active = true;
+                    }
+                }
+            });
+
+            const chestDist = Math.hypot(player.x - chest.x, player.y - chest.y);
+            if (chestDist < 30 && !chest.open) {
+                const allCollected = items.every(i => i.collected);
+                if (allCollected) {
+                    chest.open = true;
+                    openBook();
+                }
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#180b2b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#2d4a1d';
+            ctx.fillRect(0, 0, canvas.width, 40);
+            ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(80, 20, 2, 2);
+            ctx.fillRect(200, 15, 3, 3);
+            ctx.fillRect(450, 25, 2, 2);
+            ctx.fillRect(580, 10, 3, 3);
+
+            ctx.font = '18px VT323';
+            mobs.forEach(m => ctx.fillText(m.icon, m.x, m.y));
+
+            items.forEach(item => {
+                if (!item.collected) {
+                    ctx.font = '22px VT323';
+                    ctx.fillText(item.icon, item.x, item.y);
+                    ctx.fillStyle = 'rgba(216, 180, 254, 0.4)';
+                    ctx.fillRect(item.x - 2, item.y - 18, 20, 20);
+                }
+            });
+
+            ctx.fillStyle = chest.open ? '#f59e0b' : '#854d0e';
+            ctx.fillRect(chest.x, chest.y, chest.width, chest.height);
+            ctx.fillStyle = '#000';
+            ctx.strokeRect(chest.x, chest.y, chest.width, chest.height);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(chest.x + 12, chest.y + 10, 6, 8);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px VT323';
+            ctx.fillText(chest.open ? '¡ABIERTO!' : '📦 COFRE', chest.x - 10, chest.y - 8);
+
+            if (vaquita.active) {
+                ctx.font = '18px VT323';
+                ctx.fillText('🐶', vaquita.x, vaquita.y);
+            }
+
+            ctx.fillStyle = '#261810';
+            ctx.fillRect(player.x - 2, player.y - 14, 20, 8);
+            ctx.fillStyle = '#fca5a5';
+            ctx.fillRect(player.x, player.y - 6, 16, 10);
+            ctx.fillStyle = '#e9d5ff';
+            ctx.fillRect(player.x - 2, player.y + 4, 20, 14);
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(player.x, player.y + 18, 16, 12);
+
+            ctx.fillStyle = '#000';
+            ctx.fillRect(player.x + 3, player.y - 3, 3, 3);
+            ctx.fillRect(player.x + 10, player.y - 3, 3, 3);
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(player.x - 8, player.y - 28, 32, 12);
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px VT323';
+            ctx.fillText('Lili', player.x, player.y - 18);
+
+            const collectedCount = items.filter(i => i.collected).length;
+            ctx.fillStyle = '#facc15';
+            ctx.font = '16px VT323';
+            ctx.fillText(`Ítems recolectados: ${collectedCount}/${items.length}`, 20, 25);
+
+            if (collectedCount === items.length && !chest.open) {
+                ctx.fillStyle = '#34d399';
+                ctx.fillText('¡Ve al cofre para abrir tu regalo!', 380, 25);
+            }
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
